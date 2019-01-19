@@ -2,8 +2,6 @@
 
 namespace MyBB\Tests\Unit\Traits;
 
-use Mockery\Mock;
-
 /**
  * This trait can be used by any unit tests that is testing a legacy MyBB component.
  *
@@ -29,36 +27,51 @@ trait LegacyCoreAwareTest
         // The core MyBB class expects to be accessed by a browser
         $_SERVER['REQUEST_METHOD'] = 'get';
 
-        $GLOBALS['mybb'] = new \MyBB();
-        $GLOBALS['plugins'] = new \pluginSystem();
-        $GLOBALS['lang'] = new \MyLanguage();
-        $GLOBALS['cache'] = new \datacache();
+        if (!isset($GLOBALS['mybb'])) {
+            $GLOBALS['mybb'] = new \MyBB();
 
-        $GLOBALS['mybb']->settings = [
-            'bburl' => 'http://example.com',
-            'bbname' => 'Test Board',
-        ];
+            $GLOBALS['mybb']->settings = [
+                'bburl' => 'http://example.com',
+                'bbname' => 'Test Board',
+            ];
+        }
 
-        $cacheHandler = \Mockery::mock('CacheHandlerInterface');
-        $cacheHandler->shouldReceive('fetch')->andReturn([]);
+        if (!isset($GLOBALS['plugins'])) {
+            $GLOBALS['plugins'] = new \pluginSystem();
+        }
 
-        $GLOBALS['lang']->settings = [
-            'charset' => 'utf-8',
-        ];
+        if (!isset($GLOBALS['lang'])) {
+            $GLOBALS['lang'] = new \MyLanguage();
 
-        $GLOBALS['lang']->set_path(__DIR__ . '/../../../inc/languages');
+            $GLOBALS['lang']->settings = [
+                'charset' => 'utf-8',
+            ];
 
-        $GLOBALS['lang']->load('global');
+            $GLOBALS['lang']->set_path(__DIR__ . '/../../../inc/languages');
 
-        $GLOBALS['cache']->handler = $cacheHandler;
+            $GLOBALS['lang']->load('global');
+        }
 
-        $GLOBALS['mybb']->cache = &$GLOBALS['cache'];
+        if (!isset($GLOBALS['cache'])) {
+            $GLOBALS['cache'] = new \datacache();
 
-        $templatesMock = \Mockery::mock(\templates::class);
-        $GLOBALS['templates'] = $templatesMock;
+            $cacheHandler = \Mockery::mock('CacheHandlerInterface');
+            $cacheHandler->shouldReceive('fetch')->andReturn([]);
 
-        $dbMock = \Mockery::mock(\DB_Base::class);
-        $GLOBALS['db'] = $dbMock;
+            $GLOBALS['cache']->handler = $cacheHandler;
+
+            $GLOBALS['mybb']->cache = &$GLOBALS['cache'];
+        }
+
+        if (!isset($GLOBALS['templates'])) {
+            $templatesMock = \Mockery::mock(\templates::class);
+            $GLOBALS['templates'] = $templatesMock;
+        }
+
+        if (!isset($GLOBALS['db'])) {
+            $dbMock = \Mockery::mock(\DB_Base::class);
+            $GLOBALS['db'] = $dbMock;
+        }
 
         require_once __DIR__ . '/../../../inc/functions.php';
     }

@@ -3,11 +3,14 @@
 namespace MyBB\Twig;
 
 use Illuminate\Contracts\Container\Container;
+use MyBB\Menu\MenuManager;
 use MyBB\Twig\Extensions\CoreExtension;
 use MyBB\Twig\Extensions\LangExtension;
+use MyBB\Twig\Extensions\MenuExtension;
 use MyBB\Twig\Extensions\ThemeExtension;
 use MyBB\Twig\Extensions\UrlExtension;
 use MyBB\Utilities\BreadcrumbManager;
+use Psr\Container\ContainerInterface;
 
 /** @property \MyBB\Application $app */
 class ServiceProvider extends \MyBB\ServiceProvider
@@ -16,30 +19,36 @@ class ServiceProvider extends \MyBB\ServiceProvider
 
     public function register()
     {
-        $this->app->bind(CoreExtension::class, function (Container $container) {
+        $this->app->bind(CoreExtension::class, function (ContainerInterface $container) {
             return new CoreExtension(
-                $container->make(\MyBB::class),
-                $container->make(\MyLanguage::class),
-                $container->make(\pluginSystem::class),
-                $container->make(BreadcrumbManager::class)
+                $container->get(\MyBB::class),
+                $container->get(\MyLanguage::class),
+                $container->get(\pluginSystem::class),
+                $container->get(BreadcrumbManager::class)
             );
         });
 
-        $this->app->bind(ThemeExtension::class, function (Container $container) {
+        $this->app->bind(ThemeExtension::class, function (ContainerInterface $container) {
             return new ThemeExtension(
-                $container->make(\MyBB::class),
-                $container->make(\DB_Base::class)
+                $container->get(\MyBB::class),
+                $container->get(\DB_Base::class)
             ) ;
         });
 
-        $this->app->bind(LangExtension::class, function (Container $container) {
+        $this->app->bind(LangExtension::class, function (ContainerInterface $container) {
             return new LangExtension(
-                $container->make(\MyLanguage::class)
+                $container->get(\MyLanguage::class)
             );
         });
 
         $this->app->bind(UrlExtension::class, function () {
             return new UrlExtension();
+        });
+
+        $this->app->bind(MenuExtension::class, function (ContainerInterface $container) {
+            return new MenuExtension(
+                $container->get(MenuManager::class)
+            );
         });
 
         $this->app->bind(\Twig_LoaderInterface::class, function () {
@@ -80,6 +89,7 @@ class ServiceProvider extends \MyBB\ServiceProvider
             $env->addExtension($container->make(ThemeExtension::class));
             $env->addExtension($container->make(LangExtension::class));
             $env->addExtension($container->make(UrlExtension::class));
+            $env->addExtension($container->make(MenuExtension::class));
 
             // TODO: this shouldn't be registered in live environments
             $env->addExtension(new \Twig_Extension_Debug());
