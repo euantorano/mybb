@@ -1,0 +1,16 @@
+<ul class="menu menu--{{ menu.name }}">
+    {% for item in menu %}
+        <li class="menu__item menu__item-{{ item.name }}">
+            {% if item.language %}
+                {{ trans(item.language) }}
+            {% else %}
+                {{ item.name }}
+            {% endif %}
+
+            {% if item.children %}
+                {{ render_menu(item.children) }}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+

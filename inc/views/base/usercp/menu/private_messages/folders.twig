@@ -1,0 +1,11 @@
+{% if item.folders|length > 0 %}
+    <ul class="folders">
+        {% for folder in item.folders %}
+            <li class="folders__{{ folder.id }} {{ folder.class }}">
+                <a href="private.php?fid={{ folder.id }}">
+                    {{ folder.name }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

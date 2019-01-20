@@ -1,0 +1,21 @@
+{% if menu|length > 0 %}
+    <ul class="usercp_nav_{{ menu.name }}">
+        {% for item in menu %}
+            {% if item.link %}
+                <li>
+                    <a href="{{ item.link }}">
+                        {% if item.language %}
+                            {{ trans(item.language) }}
+                        {% else %}
+                            {{ item.name }}
+                        {% endif %}
+                    </a>
+                </li>
+            {% elseif item.template %}
+                <li>
+                    {% include item.template %}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endif %}

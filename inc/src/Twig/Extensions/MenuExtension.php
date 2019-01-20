@@ -2,6 +2,8 @@
 
 namespace MyBB\Twig\Extensions;
 
+use http\Exception\InvalidArgumentException;
+use MyBB\Menu\MenuInterface;
 use MyBB\Menu\MenuManager;
 
 class MenuExtension extends \Twig_Extension
@@ -26,16 +28,30 @@ class MenuExtension extends \Twig_Extension
         ];
     }
 
-    public function renderMenu(\Twig_Environment $twig, string $name): ?string
+    public function renderMenu(\Twig_Environment $twig, $nameOrMenu): ?string
     {
-        $builder = $this->menuManager->getMenuBuilder($name);
+        if (is_string($nameOrMenu)) {
+            $builder = $this->menuManager->getMenuBuilder($nameOrMenu);
 
-        if (is_null($builder)) {
-            return null;
+            if (is_null($builder)) {
+                return null;
+            }
+
+            $menu = $builder->buildMenu();
+
+            return $menu->render($twig);
+        } elseif (is_object($nameOrMenu) && ($nameOrMenu instanceof MenuInterface)) {
+            return $nameOrMenu->render($twig);
+        } else {
+            if (is_object($nameOrMenu)) {
+                $type = get_class($nameOrMenu);
+            } else {
+                $type = gettype($nameOrMenu);
+            }
+
+            throw new \InvalidArgumentException(
+                "Name or menu should either be a menu name or a menu instance, got: {$type}"
+            );
         }
-
-        $menu = $builder->buildMenu();
-
-        return $menu->render($twig);
     }
 }
