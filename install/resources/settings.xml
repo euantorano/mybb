@@ -1537,6 +1537,15 @@ min=1]]></optionscode>
 			<settingvalue><![CDATA[96]]></settingvalue>
 			<isdefault>1</isdefault>
 		</setting>
+		<setting name="thumbnailsperline">
+			<title>Amount of Thumbnails per line</title>
+			<description><![CDATA[Enter the amount of thumbnails that should be shown per line.]]></description>
+			<disporder>6</disporder>
+			<optionscode><![CDATA[numeric
+min=1]]></optionscode>
+			<settingvalue><![CDATA[5]]></settingvalue>
+			<isdefault>1</isdefault>
+		</setting>
 	</settinggroup>
 	<settinggroup name="memberlist" title="Member List" description="This section allows you to control various aspects of the board member listing (memberlist.php), such as how many members to show per page, and which features to enable or disable." disporder="13" isdefault="1">
 		<setting name="enablememberlist">

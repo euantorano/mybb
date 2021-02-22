@@ -1008,7 +1008,7 @@ function get_post_attachments($id, &$post)
 					if($attachment['thumbnail'] != "SMALL" && $attachment['thumbnail'] != "" && $mybb->settings['attachthumbnails'] == "yes")
 					{
 						eval("\$post['thumblist'] .= \"".$templates->get("postbit_attachments_thumbnails_thumbnail")."\";");
-						if($tcount == 5)
+						if($tcount == $mybb->settings['thumbnailsperline'])
 						{
 							$post['thumblist'] .= "<br />";
 							$tcount = 0;
@@ -1024,7 +1024,7 @@ function get_post_attachments($id, &$post)
 						else 
 						{
 							eval("\$post['thumblist'] .= \"".$templates->get("postbit_attachments_thumbnails_thumbnail")."\";");
-							if($tcount == 5)
+							if($tcount == $mybb->settings['thumbnailsperline'])
 							{
 								$post['thumblist'] .= "<br />";
 								$tcount = 0;
