@@ -713,7 +713,7 @@ if(!empty($mybb->settings['portal_announcementsfid']))
 							if($attachment['thumbnail'] != "SMALL" && $attachment['thumbnail'] != '')
 							{ // We have a thumbnail to show
 								eval("\$post['thumblist'] .= \"".$templates->get("postbit_attachments_thumbnails_thumbnail")."\";");
-								if($tcount == 5)
+								if($tcount == $mybb->settings['thumbnailsperline'])
 								{
 									$post['thumblist'] .= "<br />";
 									$tcount = 0;
