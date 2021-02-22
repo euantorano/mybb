@@ -1539,7 +1539,7 @@ min=1]]></optionscode>
 		</setting>
 		<setting name="thumbnailsperline">
 			<title>Amount of Thumbnails per line</title>
-			<description><![CDATA[Enter the amount of thumbnails that should be shown per line.]></description>
+			<description><![CDATA[Enter the amount of thumbnails that should be shown per line.]]></description>
 			<disporder>6</disporder>
 			<optionscode><![CDATA[numeric
 min=1]]></optionscode>
