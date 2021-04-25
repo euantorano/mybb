@@ -561,31 +561,31 @@ function &get_mybb_mailhandler($use_buitlin = false)
 	static $mybb_mailhandler;
 	static $mybb_mailhandler_builtin;
 
-	// If our built-in mail handler doesn't exist, create it.
-	if(!is_object($mybb_mailhandler_builtin))
-	{
-		require_once MYBB_ROOT . "inc/class_mailhandler.php";
-
-		// Using SMTP.
-		if(isset($mybb->settings['mail_handler']) && $mybb->settings['mail_handler'] == 'smtp')
-		{
-			require_once MYBB_ROOT . "inc/mailhandlers/smtp.php";
-			$mybb_mailhandler_builtin = new SmtpMail();
-		}
-		// Using PHP mail().
-		else
-		{
-			require_once MYBB_ROOT . "inc/mailhandlers/php.php";
-			$mybb_mailhandler_builtin = new PhpMail();
-			if(!empty($mybb->settings['mail_parameters']))
-			{
-				$mybb_mailhandler_builtin->additional_parameters = $mybb->settings['mail_parameters'];
-			}
-		}
-	}
-
 	if($use_buitlin)
 	{
+		// If our built-in mail handler doesn't exist, create it.
+		if(!is_object($mybb_mailhandler_builtin))
+		{
+			require_once MYBB_ROOT . "inc/class_mailhandler.php";
+
+			// Using SMTP.
+			if(isset($mybb->settings['mail_handler']) && $mybb->settings['mail_handler'] == 'smtp')
+			{
+				require_once MYBB_ROOT . "inc/mailhandlers/smtp.php";
+				$mybb_mailhandler_builtin = new SmtpMail();
+			}
+			// Using PHP mail().
+			else
+			{
+				require_once MYBB_ROOT . "inc/mailhandlers/php.php";
+				$mybb_mailhandler_builtin = new PhpMail();
+				if(!empty($mybb->settings['mail_parameters']))
+				{
+					$mybb_mailhandler_builtin->additional_parameters = $mybb->settings['mail_parameters'];
+				}
+			}
+		}
+
 		return $mybb_mailhandler_builtin;
 	}
 
@@ -598,7 +598,7 @@ function &get_mybb_mailhandler($use_buitlin = false)
 
 		if(!is_object($mybb_mailhandler) || !($mybb_mailhandler instanceof MailHandler))
 		{
-			$mybb_mailhandler = &$mybb_mailhandler_builtin;
+			$mybb_mailhandler = &get_mybb_mailhandler(true);
 		}
 
 		$plugins->run_hooks('mybb_mailhandler_after_init', $mybb_mailhandler);
