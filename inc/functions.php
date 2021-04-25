@@ -643,7 +643,6 @@ function my_mail($to, $subject, $message, $from="", $charset="", $headers="", $k
 			}
 		}
 	}
-	$my_mail_parameters = compact("to", "subject", "message", "from", "charset", "headers", "keep_alive", "format", "message_text", "return_email");
 
 	// If MyBB's built-in SMTP mail handler is used, set the keep alive bit accordingly.
 	if(isset($mybb->settings['mail_handler']) && $mybb->settings['mail_handler'] == 'smtp' && $keep_alive == true && !empty($mail->keep_alive))
@@ -659,12 +658,30 @@ function my_mail($to, $subject, $message, $from="", $charset="", $headers="", $k
 	// Build the mail message.
 	$mail->build_message($to, $subject, $message, $from, $charset, $headers, $format, $message_text, $return_email);
 
-	// Send the mail via this hook, if any.
-	// The hook would return true/false if the mail is sent or not, otherwise anything else that is none boolean.
-	$sent = $plugins->run_hooks('my_mail_send', $my_mail_parameters);
+	// Following variables will help sequential plugins to determine how to process the hook.
+	// Mark this variable true if the hooked plugin has sent the mail, otherwise don't modify it.
+	$is_mail_sent = false;
+	// Mark this variable false if the hooked plugin doesn't suggest sequential plugins to continue processing.
+	$continue_process = true;
+
+	$my_mail_parameters = compact("to", "subject", "message", "from", "charset", "headers", "keep_alive", "format", "message_text", "return_email", "is_mail_sent", "continue_process");
+
+	// Send the mail via this hook.
+	$plugins->run_hooks('my_mail_send', $my_mail_parameters);
+
+	// Check if the hooked plugins have sent the mail.
+	if(isset($my_mail_parameters['is_mail_sent']))
+	{
+		$is_mail_sent = (bool)$my_mail_parameters['is_mail_sent'];
+	}
+	// Check if the hooked plugins still suggest to send the mail.
+	if(isset($my_mail_parameters['continue_process']))
+	{
+		$continue_process = (bool)$my_mail_parameters['continue_process'];
+	}
 
 	// Or send the mail using the mail handler.
-	return is_bool($sent) === true ? $sent : $mail->send();
+	return $continue_process ? $mail->send() : $is_mail_sent;
 }
 
 /**
