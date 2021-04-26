@@ -642,7 +642,9 @@ function my_mail($to, $subject, $message, $from="", $charset="", $headers="", $k
 	}
 
 	$my_mail_parameters = compact("to", "subject", "message", "from", "charset", "headers", "keep_alive", "format", "message_text", "return_email");
-	$my_mail_parameters = $plugins->run_hooks('my_mail_parameters', $my_mail_parameters);
+
+	$my_mail_parameters = $plugins->run_hooks('my_mail_pre_build_message', $my_mail_parameters);
+
 	if(is_array($my_mail_parameters))
 	{
 		foreach($my_mail_parameters as $key => $value)
@@ -666,8 +668,7 @@ function my_mail($to, $subject, $message, $from="", $charset="", $headers="", $k
 
 	$my_mail_parameters = compact("to", "subject", "message", "from", "charset", "headers", "keep_alive", "format", "message_text", "return_email", "is_mail_sent", "continue_process");
 
-	// Send the mail via this hook.
-	$plugins->run_hooks('my_mail_send', $my_mail_parameters);
+	$plugins->run_hooks('my_mail_pre_send', $my_mail_parameters);
 
 	// Check if the hooked plugins have sent the mail.
 	if(isset($my_mail_parameters['is_mail_sent']))
@@ -680,8 +681,16 @@ function my_mail($to, $subject, $message, $from="", $charset="", $headers="", $k
 		$continue_process = (bool)$my_mail_parameters['continue_process'];
 	}
 
-	// Or send the mail using the mail handler.
-	return $continue_process ? $mail->send() : $is_mail_sent;
+	if($continue_process)
+	{
+		$is_mail_sent = $mail->send();
+	}
+
+	$my_mail_parameters = compact("to", "subject", "message", "from", "charset", "headers", "keep_alive", "format", "message_text", "return_email", "is_mail_sent", "continue_process");
+
+	$plugins->run_hooks('my_mail_post_send', $my_mail_parameters);
+
+	return $is_mail_sent;
 }
 
 /**
