@@ -630,6 +630,17 @@ function my_mail($to, $subject, $message, $from="", $charset="", $headers="", $k
 	// Get our mail handler.
 	$mail = &get_mybb_mailhandler();
 
+	// If MyBB's built-in SMTP mail handler is used, set the keep alive bit accordingly.
+	if(isset($mybb->settings['mail_handler']) && $mybb->settings['mail_handler'] == 'smtp' && $keep_alive == true && !empty($mail->keep_alive))
+	{
+		require_once MYBB_ROOT . "inc/class_mailhandler.php";
+		require_once MYBB_ROOT . "inc/mailhandlers/smtp.php";
+		if($mail instanceof MailHandler && $mail instanceof SmtpMail)
+		{
+			$mail->keep_alive = true;
+		}
+	}
+
 	$my_mail_parameters = compact("to", "subject", "message", "from", "charset", "headers", "keep_alive", "format", "message_text", "return_email");
 	$my_mail_parameters = $plugins->run_hooks('my_mail_parameters', $my_mail_parameters);
 	if(is_array($my_mail_parameters))
@@ -641,17 +652,6 @@ function my_mail($to, $subject, $message, $from="", $charset="", $headers="", $k
 			{
 				$$key = $value;
 			}
-		}
-	}
-
-	// If MyBB's built-in SMTP mail handler is used, set the keep alive bit accordingly.
-	if(isset($mybb->settings['mail_handler']) && $mybb->settings['mail_handler'] == 'smtp' && $keep_alive == true && !empty($mail->keep_alive))
-	{
-		require_once MYBB_ROOT . "inc/class_mailhandler.php";
-		require_once MYBB_ROOT . "inc/mailhandlers/smtp.php";
-		if($mail instanceof MailHandler && $mail instanceof SmtpMail)
-		{
-			$mail->keep_alive = true;
 		}
 	}
 
